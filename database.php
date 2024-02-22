@@ -9,7 +9,7 @@ class Database
     {
         try {
             $this->connect = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-        } catch (Exception $exception){
+        } catch (Exception $exception) {
             return die("Ошибка подключения к Базе данных: " . $exception->getMessage());
         }
 
@@ -26,23 +26,36 @@ class Database
     public function createTable()
     {
         try {
-            $sql = "CREATE TABLE IF NOT EXISTS `Parser` (
+            $sql = "CREATE TABLE IF NOT EXISTS `Products` (
 	`id` INT NOT NULL AUTO_INCREMENT,
-	`photo` varchar(200) NOT NULL,
+	`article` varchar(200) NOT NULL,
 	`product_name` varchar(200) NOT NULL,
 	`price` INT NOT NULL,
 	PRIMARY KEY (`id`)
 )";
             $this->connect->query($sql);
+
             $sql = "CREATE TABLE IF NOT EXISTS `Description` (
 	`id` INT NOT NULL AUTO_INCREMENT,
-	`product_id` INT NOT NULL,
+	`product_article` varchar(200) NULL,
 	`characteristic` varchar(200) NULL,
 	`description` varchar(200) NULL,
 	PRIMARY KEY (`id`)
 )";
             $this->connect->query($sql);
-            $sql = "ALTER TABLE `Description` ADD CONSTRAINT `description_fk0` FOREIGN KEY (`product_id`) REFERENCES `Parser`(`id`)";
+
+            $sql = "CREATE TABLE IF NOT EXISTS `Photos` (
+            `id` INT NOT NULL AUTO_INCREMENT,
+	`product_article` varchar(200) NULL,
+	`photo` varchar(200) NULL,
+	PRIMARY KEY (`id`)
+);";
+            $this->connect->query($sql);
+
+            $sql = "ALTER TABLE `Description` ADD CONSTRAINT `description_fk0` FOREIGN KEY (`product_article`) REFERENCES `Products`(`article`)";
+            $this->connect->query($sql);
+
+            $sql = "ALTER TABLE `Photos` ADD CONSTRAINT `Photos_fk0` FOREIGN KEY (`product_article`) REFERENCES `Products`(`article`);";
             $this->connect->query($sql);
         } catch (Exception $exception) {
             echo "Ошибка создания таблицы: " . $exception->getMessage();
@@ -54,7 +67,7 @@ class Database
     {
 
         try {
-            $sql = "DROP TABLE IF EXISTS `Parser`, `Description`";
+            $sql = "DROP TABLE IF EXISTS `Products`, `Description`";
             $this->connect->query($sql);
         } catch (Exception $exception) {
             echo "Ошибка удаления таблицы: " . $exception->getMessage();
